@@ -1,6 +1,14 @@
 #ifndef KSU_SUSFS_DEF_H
 #define KSU_SUSFS_DEF_H
 
+/*
+ * oki vendor trees: preinit runner needs UAPI headers_install which is unreliable
+ * here; disable preinit hooks kernel-wide (same mode BakaSU itself uses when
+ * headers are missing). exec.c KSU preinit blocks compile out, avoiding undefined
+ * ksu_setup_preinit_file/ksu_preinit_handle_post_execveat at vmlinux link.
+ */
+#define KSU_NO_PREINIT 1
+
 #include <linux/bits.h>
 #include <linux/bitmap.h>
 #include <linux/string.h>
