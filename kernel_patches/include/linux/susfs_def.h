@@ -1,7 +1,13 @@
 #ifndef KSU_SUSFS_DEF_H
 #define KSU_SUSFS_DEF_H
 
+/* oki vendor trees: preinit runner needs UAPI headers_install which is unreliable
+ * here; disable preinit hooks kernel-wide (same mode BakaSU uses when headers are
+ * missing) so exec.c KSU preinit blocks compile out and vmlinux links. */
+#define KSU_NO_PREINIT 1
+
 #include <linux/bits.h>
+#include <linux/bitmap.h>
 #include <linux/string.h>
 
 /********/
@@ -32,6 +38,7 @@
 #define CMD_SUSFS_SUS_SU 0x60000 /* deprecated */
 #define CMD_SUSFS_ENABLE_AVC_LOG_SPOOFING 0x60010
 #define CMD_SUSFS_ADD_SUS_MAP 0x60020
+#define CMD_SUSFS_SET_PRIORITY_UID_FILTER 0x60030
 
 #define SUSFS_MAX_LEN_PATHNAME 256 // 256 should address many paths already unless you are doing some strange experimental stuff, then set your own desired length
 #define SUSFS_FAKE_CMDLINE_OR_BOOTCONFIG_SIZE 8192 // 8192 is enough I guess
@@ -77,6 +84,19 @@
 
 #define STATX_SUS_KSTAT 0x10000000U
 #define STATX_SUS_KSTAT_FUSE 0x20000000U
+
+/*****************************************/
+/* getpriority uid filter (bitmap)       */
+/*****************************************/
+/* The uids that are hidden from the apps that abuse the getpriority syscall
+ * to find out the existing uids. Only the uids within the app uid range
+ * (10000 - 19999) are supported.
+ */
+#define SUSFS_PRIORITY_UID_FILTER_MIN_UID 10000
+#define SUSFS_PRIORITY_UID_FILTER_MAX_UID 19999
+#define SUSFS_PRIORITY_UID_FILTER_UID_NUM (SUSFS_PRIORITY_UID_FILTER_MAX_UID - SUSFS_PRIORITY_UID_FILTER_MIN_UID + 1)
+#define SUSFS_PRIORITY_UID_FILTER_BITMAP_LEN BITS_TO_LONGS(SUSFS_PRIORITY_UID_FILTER_UID_NUM)
+#define SUSFS_APP_STR_BUF_SIZE 65535
 
 static inline bool susfs_starts_with(const char *str, const char *prefix) {
     while (*prefix) {
