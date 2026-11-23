@@ -1946,3 +1946,9 @@ void susfs_init(void) {\
 /* No module exit is needed becuase it should never be a loadable kernel module */
 //void __init susfs_exit(void)
 
+
+
+/* stub for BakaSU 35282 dispatch.c: uid_filter not implemented in 2.3.0; keep 2.3.0 selinux_hide */
+void susfs_set_sus_path_uid_filter(void __user **user_info) {
+	/* no-op */
+}
